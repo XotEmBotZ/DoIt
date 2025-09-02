@@ -6,7 +6,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <>
       <html lang="en" suppressHydrationWarning>
         <head />
-        <body>
+        <body className="dark:bg-background bg-slate-50">
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
