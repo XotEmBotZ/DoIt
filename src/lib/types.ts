@@ -6,6 +6,5 @@ export interface Todo {
     list?: Todo;
     dueDate?: Date;
     priority: 'low' | 'medium' | 'high';
-    reminders?: Date[];
     createdAt: Date;
 }
