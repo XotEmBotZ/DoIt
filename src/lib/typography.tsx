@@ -1,48 +1,50 @@
-export function TypographyH1(text: string) {
+import { ReactNode } from "react"
+
+export function H1({ children }: { children: ReactNode }) {
     return (
         <h1 className="scroll-m-20 text-center text-4xl font-extrabold tracking-tight text-balance">
-            {text}
+            {children}
         </h1>
     )
 }
-export function TypographyH2(text: string) {
+export function H2({ children }: { children: ReactNode }) {
     return (
         <h2 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0">
-            {text}
+            {children}
         </h2>
     )
 }
-export function TypographyH3(text: string) {
+export function H3({ children }: { children: ReactNode }) {
     return (
         <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
-            {text}
+            {children}
         </h3>
     )
 }
-export function TypographyH4(text: string) {
+export function H4({ children }: { children: ReactNode }) {
     return (
         <h4 className="scroll-m-20 text-xl font-semibold tracking-tight">
-            {text}
+            {children}
         </h4>
     )
 }
-export function TypographyP(text: string) {
+export function P({ children }: { children: ReactNode }) {
     return (
         <p className="leading-7 [&:not(:first-child)]:mt-6">
-            {text}
+            {children}
         </p>
     )
 }
-export function TypographyBlockquote(text: string) {
+export function Blockquote({ children }: { children: ReactNode }) {
     return (
         <blockquote className="mt-6 border-l-2 pl-6 italic">
-            {text}
+            {children}
         </blockquote>
     )
 }
 
 //TODO complete them
-export function TypographyTable(text: string) {
+export function Table({ children }: { children: ReactNode }) {
     return (
         <div className="my-6 w-full overflow-y-auto">
             <table className="w-full">
@@ -86,7 +88,7 @@ export function TypographyTable(text: string) {
         </div>
     )
 }
-export function TypographyList(text: string) {
+export function List({ children }: { children: ReactNode }) {
     return (
         <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
             <li>1st level of puns: 5 gold coins</li>
@@ -95,14 +97,14 @@ export function TypographyList(text: string) {
         </ul>
     )
 }
-export function TypographyInlineCode(text: string) {
+export function InlineCode({ children }: { children: ReactNode }) {
     return (
         <code className="bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
             @radix-ui/react-alert-dialog
         </code>
     )
 }
-export function TypographyLead(text: string) {
+export function Lead({ children }: { children: ReactNode }) {
     return (
         <p className="text-muted-foreground text-xl">
             A modal dialog that interrupts the user with important content and expects
@@ -110,15 +112,15 @@ export function TypographyLead(text: string) {
         </p>
     )
 }
-export function TypographyLarge(text: string) {
+export function Large({ children }: { children: ReactNode }) {
     return <div className="text-lg font-semibold">Are you absolutely sure?</div>
 }
-export function TypographySmall(text: string) {
+export function Small({ children }: { children: ReactNode }) {
     return (
         <small className="text-sm leading-none font-medium">Email address</small>
     )
 }
-export function TypographyMuted(text: string) {
+export function Muted({ children }: { children: ReactNode }) {
     return (
         <p className="text-muted-foreground text-sm">Enter your email address.</p>
     )
