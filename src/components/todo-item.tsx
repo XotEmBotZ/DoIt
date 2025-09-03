@@ -108,17 +108,14 @@ export default function TodoItem({ todo, setTodo }: { todo: Todo, setTodo?: (id:
 
         switch (action.type) {
             case 'toggle-done':
-                console.log(action, todo)
                 setTodo && setTodo(todo.id, { ...todo, isCompleted: !todo.isCompleted })
                 break;
 
             case 'update-priority':
-                console.log(action, todo)
                 setTodo && setTodo(todo.id, { ...todo, priority: action.priority })
                 break;
 
             case 'edit':
-                console.log(action, todo)
                 setTodo && setTodo(todo.id, { ...todo, ...action.newTodo })
                 break;
 
@@ -128,8 +125,8 @@ export default function TodoItem({ todo, setTodo }: { todo: Todo, setTodo?: (id:
 
 
 
-    return <div className='p-1 rounded-lg flex px-5 *:items-center *:gap-2 shadow-lg/5 bg-background border dark:bg-primary-foreground justify-between align-middle'>
-        <div className='flex flex-row'>
+    return <div className='p-1 rounded-lg flex px-5 *:items-center *:gap-2 shadow-lg/5 bg-background border dark:bg-primary-foreground justify-between align-middle max-w-full'>
+        <div className='flex flex-row max-w-4/5'>
             <Checkbox checked={todo.isCompleted} onCheckedChange={e => dispatch({ type: 'toggle-done' })} />
             <DropdownMenu>
                 <DropdownMenuTrigger>
@@ -155,8 +152,8 @@ export default function TodoItem({ todo, setTodo }: { todo: Todo, setTodo?: (id:
                 </DropdownMenuContent>
             </DropdownMenu>
             <Popover>
-                <PopoverTrigger>
-                    <p className={cn(' ', todo.isCompleted ? 'line-through' : '')}>{todo.task}</p>
+                <PopoverTrigger className="max-w-full">
+                    <p className={cn('overflow-hidden overflow-ellipsis w-full text-nowrap', todo.isCompleted ? 'line-through' : '')}>{todo.task}</p>
                 </PopoverTrigger>
                 <PopoverContent className="mt-3">
                     {/* {TodoEditor(todoData, (newTodo) => dispatch({ type: 'edit', newTodo }))} */}
