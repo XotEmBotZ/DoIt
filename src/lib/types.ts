@@ -13,3 +13,5 @@ export interface Todo {
     createdAt: Date;
     tags?: Tags
 }
+
+export const priorityStr: string[] = ['high', 'medium', 'low']

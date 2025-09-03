@@ -6,7 +6,7 @@ import { H1, P } from '@/lib/typography';
 import { cn } from '@/lib/utils';
 import React, { useState, useEffect, useReducer } from 'react';
 import { CircleArrowDown, CircleArrowUp, CircleDot, Plus } from 'lucide-react'
-import { Todo } from '@/lib/types';
+import { priorityStr, Todo } from '@/lib/types';
 import TodoItem from '@/components/todo-item';
 import {
   Popover,
@@ -82,13 +82,15 @@ export default function Home() {
         </Popover>
         <ModeToggle />
       </nav>
-      <main className='md:max-w-4/5 m-auto mt-4'>
+      <main className='md:max-w-4/5 m-auto mt-4 w-10/12'>
         <div className='flex flex-row gap-1'>
           <Input placeholder='Enter a TODO...' value={newTodoTxt} onChange={e => setNewTodoTxt(e.target.value)} onKeyUp={event => { if (event.key === 'Enter') { handleNewTodo() } }} className='bg-background' />
           <Button variant={'outline'} onClick={handleNewTodo}><Plus /></Button>
         </div>
         <div className='mt-5 flex gap-2 flex-col'>
-          {todoList.map(todo => <TodoItem todo={todo} key={todo.id} setTodo={handleTodoEdit} />)}
+          {todoList.sort((a, b) => {
+            return priorityStr.indexOf(a.priority) - priorityStr.indexOf(b.priority)
+          }).map(todo => <TodoItem todo={todo} key={todo.id} setTodo={handleTodoEdit} />)}
         </div>
         <div className='flex gap-1 justify-end mt-5'>
           <Button variant={'secondary'} onClick={handleDeleteCompleted}>Delete Completed</Button>

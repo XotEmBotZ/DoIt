@@ -140,7 +140,7 @@ export default function TodoItem({ todo, setTodo }: { todo: Todo, setTodo?: (id:
                 <div>
                     <p className={cn(
                         'text-muted-foreground text-sm self-end',
-                        todo.dueDate && new Date() > todo.dueDate ? 'text-destructive' : ''
+                        todo.dueDate && new Date() >= todo.dueDate ? 'text-destructive' : ''
                     )}>
                         {todo.dueDate ? format(todo.dueDate, 'd MMM H:mm') : ''}
                     </p>
