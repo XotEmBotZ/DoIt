@@ -103,7 +103,7 @@ export default function TodoItem({ todo, setTodo }: { todo: Todo, setTodo?: (id:
     }
 
     const handleNewTodo = () => {
-        let newSubTodo: Todo[] = Array.isArray(todo.subTodo) ? [...todo.subTodo] : []
+        const newSubTodo: Todo[] = Array.isArray(todo.subTodo) ? [...todo.subTodo] : []
         if (todo.subTodo?.map(e => e.id).includes(newTodoTxt.replace(' ', '-'))) {
             toast("SubTodo already exists", { closeButton: true })
             return
