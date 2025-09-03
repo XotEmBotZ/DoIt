@@ -1,25 +1,24 @@
 'use client';
+
 import { ModeToggle } from '@/components/theme-toggle';
+import TodoItem from '@/components/todo-item';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { H1, P } from '@/lib/typography';
-import { cn } from '@/lib/utils';
-import React, { useState, useEffect, useReducer } from 'react';
-import { CircleArrowDown, CircleArrowUp, CircleDot, Plus } from 'lucide-react'
-import { priorityStr, Todo } from '@/lib/types';
-import TodoItem from '@/components/todo-item';
+import { Label } from '@/components/ui/label';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
-import { Label } from '@/components/ui/label';
+} from "@/components/ui/popover";
+import { priorityStr, Todo } from '@/lib/types';
+import { H1 } from '@/lib/typography';
+import { Plus } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
-import { url } from 'inspector';
-import { toast } from "sonner"
+import { Suspense, useEffect, useState } from 'react';
+import { toast } from "sonner";
 
 
-export default function Home() {
+function Home() {
   const [todoList, setTodoList] = useState<Todo[]>([]);
   const urlTodolist = useSearchParams().get('todoList');
   if (urlTodolist && todoList.length === 0) {
@@ -98,7 +97,12 @@ export default function Home() {
           <Button variant={'destructive'} onClick={handleDeleteAll}>Delete Alll</Button>
         </div>
       </main>
-
     </>
   );
+}
+
+export default function Page() {
+  return <Suspense fallback={'Loading....'}>
+    <Home />
+  </Suspense>
 }

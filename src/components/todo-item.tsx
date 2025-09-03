@@ -1,22 +1,12 @@
 'use client'
-import { Todo } from "@/lib/types"
-import { cn } from "@/lib/utils"
 import { Checkbox } from "@/components/ui/checkbox"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { HoverCard, HoverCardTrigger } from "@/components/ui/hover-card"
-import { format, set } from "date-fns"
-import { Check, CircleArrowDown, CircleArrowUp, CircleDot } from "lucide-react"
-import { useReducer, useState } from "react"
-import { HoverCardContent } from "./ui/hover-card"
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
-import { Input } from "./ui/input"
-import { Label } from "./ui/label"
-import { Button } from "./ui/button"
-import { DateTimePicker } from "./date-time-picker"
 import {
     Select,
     SelectContent,
@@ -24,6 +14,15 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import { Todo } from "@/lib/types"
+import { cn } from "@/lib/utils"
+import { format } from "date-fns"
+import { CircleArrowDown, CircleArrowUp, CircleDot } from "lucide-react"
+import { useState } from "react"
+import { DateTimePicker } from "./date-time-picker"
+import { HoverCardContent } from "./ui/hover-card"
+import { Input } from "./ui/input"
+import { Label } from "./ui/label"
 
 function TodoEditor(todo: Todo, dispatch: (newTodo: Todo) => void) {
     const [taskInp, setTaskInp] = useState(todo.task)
