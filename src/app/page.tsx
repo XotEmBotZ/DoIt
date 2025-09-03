@@ -48,6 +48,10 @@ function Home() {
       toast("Todo already exists", { closeButton: true })
       return
     }
+    if (newTodoTxt.trim() === '') {
+      toast("Todo cannot be empty", { closeButton: true })
+      return
+    }
     setTodoList(prev => [...prev, {
       id: newTodoTxt.replace(' ', '-'),
       task: newTodoTxt,
