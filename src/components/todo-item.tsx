@@ -14,7 +14,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { Todo } from "@/lib/types"
+import { priorityStr, Todo } from "@/lib/types"
 import { cn } from "@/lib/utils"
 import { format } from "date-fns"
 import { CircleArrowDown, CircleArrowUp, CircleDot } from "lucide-react"
@@ -23,6 +23,9 @@ import { DateTimePicker } from "./date-time-picker"
 import { HoverCardContent } from "./ui/hover-card"
 import { Input } from "./ui/input"
 import { Label } from "./ui/label"
+import { Plus } from "lucide-react"
+import { Button } from "./ui/button"
+import { toast } from "sonner"
 
 function TodoEditor(todo: Todo, dispatch: (newTodo: Todo) => void) {
     const [taskInp, setTaskInp] = useState(todo.task)
@@ -76,6 +79,7 @@ function TodoEditor(todo: Todo, dispatch: (newTodo: Todo) => void) {
 }
 
 export default function TodoItem({ todo, setTodo }: { todo: Todo, setTodo?: (id: string, todo: Todo) => void }) {
+    const [newTodoTxt, setNewTodoTxt] = useState('')
     type TodoAction = { type: 'toggle-done' } |
     { type: 'update-priority', priority: Todo['priority'] } |
     { type: 'edit', newTodo: Todo }
@@ -98,61 +102,107 @@ export default function TodoItem({ todo, setTodo }: { todo: Todo, setTodo?: (id:
         }
     }
 
-    return <div className='p-1 rounded-lg flex px-5 *:items-center *:gap-2 shadow-lg/5 bg-background border dark:bg-primary-foreground justify-between align-middle max-w-full'>
-        <div className='flex flex-row max-w-4/5'>
-            <Checkbox checked={todo.isCompleted} onCheckedChange={e => dispatch({ type: 'toggle-done' })} />
-            <DropdownMenu>
-                <DropdownMenuTrigger>
-                    {(() => {
-                        switch (todo.priority) {
-                            case 'high':
-                                return <CircleArrowUp className='text-destructive' />
-                            case 'low':
-                                return <CircleArrowDown className='text-warning' />
-                            case 'medium':
-                                return <CircleDot />
-                        }
-                    })()}
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-fit">
-                    <DropdownMenuLabel>Priority</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuRadioGroup value={todo.priority} onValueChange={e => dispatch({ type: 'update-priority', priority: e as Todo['priority'] })}>
-                        <DropdownMenuRadioItem value="high">High</DropdownMenuRadioItem>
-                        <DropdownMenuRadioItem value="medium">Medium</DropdownMenuRadioItem>
-                        <DropdownMenuRadioItem value="low">Low</DropdownMenuRadioItem>
-                    </DropdownMenuRadioGroup>
-                </DropdownMenuContent>
-            </DropdownMenu>
-            <Popover>
-                <PopoverTrigger className="max-w-full">
-                    <p className={cn('overflow-hidden overflow-ellipsis w-full text-nowrap', todo.isCompleted ? 'line-through' : '')}>{todo.task}</p>
-                </PopoverTrigger>
-                <PopoverContent className="mt-3">
-                    {TodoEditor(todo, (newTodo) => dispatch({ type: 'edit', newTodo }))}
-                </PopoverContent>
-            </Popover>
+    const handleNewTodo = () => {
+        let newSubTodo: Todo[] = Array.isArray(todo.subTodo) ? [...todo.subTodo] : []
+        if (todo.subTodo?.map(e => e.id).includes(newTodoTxt.replace(' ', '-'))) {
+            toast("SubTodo already exists", { closeButton: true })
+            return
+        }
+        newSubTodo.push({
+            id: newTodoTxt.replace(' ', '-'),
+            task: newTodoTxt,
+            isCompleted: false,
+            priority: 'medium',
+            createdAt: new Date()
+        })
+        setTodo && setTodo(todo.id, { ...todo, subTodo: newSubTodo })
+    }
 
+    const handleEditSubTodo = (id: string, subTodo: Todo) => {
+        dispatch({
+            type: 'edit',
+            newTodo: { ...todo, subTodo: todo.subTodo ? todo.subTodo.map(t => t.id === id ? subTodo : t) : [subTodo] }
+        })
+    }
+
+    return (
+        <div>
+            <div className='p-1 rounded-lg flex px-5 *:items-center *:gap-2 shadow-lg/5 bg-background border dark:bg-primary-foreground justify-between align-middle max-w-full'>
+                <div className='flex flex-row max-w-4/5'>
+                    <Checkbox checked={todo.isCompleted} onCheckedChange={e => dispatch({ type: 'toggle-done' })} />
+                    <DropdownMenu>
+                        <DropdownMenuTrigger>
+                            {(() => {
+                                switch (todo.priority) {
+                                    case 'high':
+                                        return <CircleArrowUp className='text-destructive' />
+                                    case 'low':
+                                        return <CircleArrowDown className='text-warning' />
+                                    case 'medium':
+                                        return <CircleDot />
+                                }
+                            })()}
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-fit">
+                            <DropdownMenuLabel>Priority</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuRadioGroup value={todo.priority} onValueChange={e => dispatch({ type: 'update-priority', priority: e as Todo['priority'] })}>
+                                <DropdownMenuRadioItem value="high">High</DropdownMenuRadioItem>
+                                <DropdownMenuRadioItem value="medium">Medium</DropdownMenuRadioItem>
+                                <DropdownMenuRadioItem value="low">Low</DropdownMenuRadioItem>
+                            </DropdownMenuRadioGroup>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                    <Popover>
+                        <PopoverTrigger className="max-w-full">
+                            <p className={cn('overflow-hidden overflow-ellipsis w-full text-nowrap', todo.isCompleted ? 'line-through' : '')}>{todo.task}</p>
+                        </PopoverTrigger>
+                        <PopoverContent className="mt-3">
+                            {TodoEditor(todo, (newTodo) => dispatch({ type: 'edit', newTodo }))}
+                        </PopoverContent>
+                    </Popover>
+
+                </div>
+
+                <div className="flex flex-row gap-3">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger>
+                            <div>
+                                <Plus className="" onClick={e => console.log("GAR MARA")} />
+                            </div>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                            <div className='flex flex-row gap-1 p-1'>
+                                <Input placeholder='Enter a TODO...' value={newTodoTxt} onChange={e => setNewTodoTxt(e.target.value)} onKeyUp={event => { if (event.key === 'Enter') { handleNewTodo() } }} className='bg-background' />
+                                <Button variant={'outline'} onClick={handleNewTodo}><Plus /></Button>
+                            </div>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                    <HoverCard>
+                        <HoverCardTrigger>
+                            <p className={cn(
+                                'text-muted-foreground text-sm self-end',
+                                todo.dueDate && new Date() >= todo.dueDate ? 'text-destructive' : ''
+                            )}>
+                                {todo.dueDate ? format(todo.dueDate, 'd MMM H:mm') : ''}
+                            </p>
+
+                        </HoverCardTrigger>
+                        <HoverCardContent>
+                            <div className="w-fit">
+                                <p>
+                                    CreatedAt: {format(todo.createdAt, 'dd MMM yyyy HH:mm:ss')}
+                                </p>
+                            </div>
+                        </HoverCardContent>
+                    </HoverCard>
+                </div>
+            </div>
+            <div className="pl-5 flex gap-1 flex-col mt-1">
+                {todo.subTodo ? todo.subTodo.sort((a, b) => {
+                    return priorityStr.indexOf(a.priority) - priorityStr.indexOf(b.priority)
+                }).map(todo => <TodoItem todo={todo} setTodo={handleEditSubTodo} />) : <></>}
+            </div>
         </div>
-        <HoverCard>
-            <HoverCardTrigger>
-                <div>
-                    <p className={cn(
-                        'text-muted-foreground text-sm self-end',
-                        todo.dueDate && new Date() >= todo.dueDate ? 'text-destructive' : ''
-                    )}>
-                        {todo.dueDate ? format(todo.dueDate, 'd MMM H:mm') : ''}
-                    </p>
-                </div>
-            </HoverCardTrigger>
-            <HoverCardContent>
-                <div className="w-fit">
-                    <p>
-                        CreatedAt: {format(todo.createdAt, 'dd MMM yyyy HH:mm:ss')}
-                    </p>
-                </div>
-            </HoverCardContent>
-        </HoverCard>
-    </div>
-
+    )
 }
