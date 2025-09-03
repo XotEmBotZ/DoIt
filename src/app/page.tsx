@@ -1,103 +1,104 @@
-import Image from "next/image";
+'use client';
+import { ModeToggle } from '@/components/theme-toggle';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { H1, P } from '@/lib/typography';
+import { cn } from '@/lib/utils';
+import React, { useState, useEffect, useReducer } from 'react';
+import { CircleArrowDown, CircleArrowUp, CircleDot, Plus } from 'lucide-react'
+import { priorityStr, Todo } from '@/lib/types';
+import TodoItem from '@/components/todo-item';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { Label } from '@/components/ui/label';
+import { useSearchParams } from 'next/navigation';
+import { url } from 'inspector';
+import { toast } from "sonner"
+
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [todoList, setTodoList] = useState<Todo[]>([]);
+  const urlTodolist = useSearchParams().get('todoList');
+  if (urlTodolist && todoList.length === 0) {
+    console.log('Loading from URL')
+    console.log(urlTodolist)
+    setTodoList(JSON.parse(urlTodolist));
+  }
+  const [newTodoTxt, setNewTodoTxt] = useState('');
+  const [domain, setDomain] = useState('')
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  useEffect(() => {
+    if (!urlTodolist) {
+      setTodoList(JSON.parse(localStorage.getItem('todos') || '[]'))
+    }
+    setDomain(window.location.origin)
+  }, [])
+
+
+  useEffect(() => {
+    localStorage.setItem('todos', JSON.stringify(todoList))
+    document.title = `DoIt - ${todoList.filter(val => !val.isCompleted).length} left`
+  }, [todoList])
+
+
+  const handleNewTodo = () => {
+    if (todoList.map(t => t.id).includes(newTodoTxt.replace(' ', '-'))) {
+      toast("Todo already exists", { closeButton: true })
+      return
+    }
+    setTodoList(prev => [...prev, {
+      id: newTodoTxt.replace(' ', '-'),
+      task: newTodoTxt,
+      isCompleted: false,
+      priority: 'medium',
+      createdAt: new Date()
+    }])
+    setNewTodoTxt('')
+  }
+
+  const handleTodoEdit = (todoId: string, todo: Todo) => {
+    setTodoList(prev => [...prev.map(t => t.id === todoId ? todo : t)])
+  }
+
+  const handleDeleteCompleted = () => {
+    setTodoList(prev => prev.filter(val => !val.isCompleted))
+  }
+  const handleDeleteAll = () => {
+    setTodoList(prev => [])
+  }
+  return (
+    <>
+      <nav className='flex flex-row justify-between items-center px-4 py-2'>
+        <H1>DoIt</H1>
+        <Popover>
+          <PopoverTrigger>
+            <Label className='p-3 bg-muted rounded-xl'>Get Shareable Link</Label>
+          </PopoverTrigger>
+          <PopoverContent>
+            <Input value={domain + '?todoList=' + encodeURIComponent((JSON.stringify(todoList)))} readOnly />
+          </PopoverContent>
+        </Popover>
+        <ModeToggle />
+      </nav>
+      <main className='md:max-w-4/5 m-auto mt-4 w-10/12'>
+        <div className='flex flex-row gap-1'>
+          <Input placeholder='Enter a TODO...' value={newTodoTxt} onChange={e => setNewTodoTxt(e.target.value)} onKeyUp={event => { if (event.key === 'Enter') { handleNewTodo() } }} className='bg-background' />
+          <Button variant={'outline'} onClick={handleNewTodo}><Plus /></Button>
+        </div>
+        <div className='mt-5 flex gap-2 flex-col'>
+          {todoList.sort((a, b) => {
+            return priorityStr.indexOf(a.priority) - priorityStr.indexOf(b.priority)
+          }).map(todo => <TodoItem todo={todo} key={todo.id} setTodo={handleTodoEdit} />)}
+        </div>
+        <div className='flex gap-1 justify-end mt-5'>
+          <Button variant={'secondary'} onClick={handleDeleteCompleted}>Delete Completed</Button>
+          <Button variant={'destructive'} onClick={handleDeleteAll}>Delete Alll</Button>
         </div>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+
+    </>
   );
 }
