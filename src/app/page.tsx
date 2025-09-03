@@ -40,6 +40,7 @@ export default function Home() {
 
   useEffect(() => {
     localStorage.setItem('todos', JSON.stringify(todoList))
+    document.title = `DoIt - ${todoList.filter(val => !val.isCompleted).length} left`
   }, [todoList])
 
 
