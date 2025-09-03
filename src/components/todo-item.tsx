@@ -108,6 +108,10 @@ export default function TodoItem({ todo, setTodo }: { todo: Todo, setTodo?: (id:
             toast("SubTodo already exists", { closeButton: true })
             return
         }
+        if (newTodoTxt.trim() === '') {
+            toast("SubTodo cannot be empty", { closeButton: true })
+            return
+        }
         newSubTodo.push({
             id: newTodoTxt.replace(' ', '-'),
             task: newTodoTxt,
@@ -201,7 +205,7 @@ export default function TodoItem({ todo, setTodo }: { todo: Todo, setTodo?: (id:
             <div className="pl-5 flex gap-1 flex-col mt-1">
                 {todo.subTodo ? todo.subTodo.sort((a, b) => {
                     return priorityStr.indexOf(a.priority) - priorityStr.indexOf(b.priority)
-                }).map(todo => <TodoItem todo={todo} setTodo={handleEditSubTodo} />) : <></>}
+                }).map(todo => <TodoItem todo={todo} setTodo={handleEditSubTodo} key={todo.id} />) : <></>}
             </div>
         </div>
     )
