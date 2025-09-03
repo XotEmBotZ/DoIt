@@ -17,36 +17,16 @@ import { Input } from "./ui/input"
 import { Label } from "./ui/label"
 import { Button } from "./ui/button"
 import { DateTimePicker } from "./date-time-picker"
-
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 
 function TodoEditor(todo: Todo, dispatch: (newTodo: Todo) => void) {
-    const [todoData, setTodoData] = useState(todo)
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const { name, value, type } = e.target;
-
-        const newValue =
-            type === 'checkbox' ? (e.target as HTMLInputElement).checked
-                : type === 'date' ? (value ? new Date(value) : undefined)
-                    : value;
-
-        setTodoData(prev => ({
-            ...prev,
-            [name]: newValue,
-        }));
-    };
-
-    const handleChk = (checked: boolean) => {
-        setTodoData(prev => ({
-            ...prev,
-            isCompleted: checked,
-        }));
-    }
-
-    const handleSaveChanges = () => {
-        dispatch(todoData);
-    };
-
+    const [taskInp, setTaskInp] = useState(todo.task)
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: '400px' }}>
 
@@ -54,8 +34,8 @@ function TodoEditor(todo: Todo, dispatch: (newTodo: Todo) => void) {
                 <Checkbox
                     id="isCompleted"
                     name="isCompleted"
-                    checked={todoData.isCompleted}
-                    onCheckedChange={handleChk}
+                    checked={todo.isCompleted}
+                    onCheckedChange={e => dispatch({ ...todo, isCompleted: e as boolean })}
                     style={{ width: '16px', height: '16px' }}
                 />
                 <div>
@@ -64,8 +44,11 @@ function TodoEditor(todo: Todo, dispatch: (newTodo: Todo) => void) {
                         id="task"
                         type="text"
                         name="task"
-                        value={todoData.task}
-                        onChange={e => setTodoData(prev => { return { ...prev, task: e.target.value, id: e.target.value.replace(' ', '-') } })}
+                        value={taskInp}
+                        onChange={e => setTaskInp(e.target.value)}
+                        onBlur={e => {
+                            dispatch({ ...todo, task: taskInp, id: taskInp.replace(' ', '-') })
+                        }}
                         required
                         style={{ width: '100%', padding: '8px' }}
                     />
@@ -73,27 +56,21 @@ function TodoEditor(todo: Todo, dispatch: (newTodo: Todo) => void) {
             </div>
             <div>
                 <Label htmlFor="priority" style={{ display: 'block', marginBottom: '4px' }}>Priority</Label>
-                <select
-                    id="priority"
-                    name="priority"
-                    value={todoData.priority}
-                    onChange={handleChange}
-                    style={{ width: '100%', padding: '8px' }}
-                >
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
-                </select>
+                <Select defaultValue={todo.priority} onValueChange={(val) => dispatch({ ...todo, priority: val as Todo['priority'] })}>
+                    <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Priority" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="low">Low</SelectItem>
+                        <SelectItem value="medium">Meduim</SelectItem>
+                        <SelectItem value="high">High</SelectItem>
+                    </SelectContent>
+                </Select>
             </div>
             <div>
                 <Label htmlFor="dueDate" style={{ display: 'block', marginBottom: '4px' }}>Due Date</Label>
-                <DateTimePicker date={todoData.dueDate} setDate={date => setTodoData(prev => {
-                    return { ...prev, dueDate: date }
-                })} />
+                <DateTimePicker date={todo.dueDate} setDate={date => dispatch({ ...todo, dueDate: date })} />
             </div>
-            <Button onClick={handleSaveChanges} style={{ padding: '10px', cursor: 'pointer' }}>
-                Save Changes
-            </Button>
         </div>
     );
 
@@ -121,9 +98,6 @@ export default function TodoItem({ todo, setTodo }: { todo: Todo, setTodo?: (id:
 
         }
     }
-    // const [todoData, dispatch] = useReducer(reducer, todo)
-
-
 
     return <div className='p-1 rounded-lg flex px-5 *:items-center *:gap-2 shadow-lg/5 bg-background border dark:bg-primary-foreground justify-between align-middle max-w-full'>
         <div className='flex flex-row max-w-4/5'>
@@ -156,7 +130,7 @@ export default function TodoItem({ todo, setTodo }: { todo: Todo, setTodo?: (id:
                     <p className={cn('overflow-hidden overflow-ellipsis w-full text-nowrap', todo.isCompleted ? 'line-through' : '')}>{todo.task}</p>
                 </PopoverTrigger>
                 <PopoverContent className="mt-3">
-                    {/* {TodoEditor(todoData, (newTodo) => dispatch({ type: 'edit', newTodo }))} */}
+                    {TodoEditor(todo, (newTodo) => dispatch({ type: 'edit', newTodo }))}
                 </PopoverContent>
             </Popover>
 

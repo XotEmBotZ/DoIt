@@ -12,8 +12,19 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
+import { format } from "date-fns"
 
 export function DateTimePicker({ date, setDate }: { date: Date | undefined, setDate: (date: Date | undefined) => void }) {
+    const formatTimeToHHMMSS = (dateObj: Date) => {
+        if (!dateObj) return '00:00:00';
+
+        const hours = String(dateObj.getHours()).padStart(2, '0');
+        const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+        const seconds = String(dateObj.getSeconds()).padStart(2, '0');
+
+        return `${hours}:${minutes}:${seconds}`;
+    };
+
     const options = {
         hour: '2-digit',
         minute: '2-digit',
@@ -21,7 +32,6 @@ export function DateTimePicker({ date, setDate }: { date: Date | undefined, setD
         hour12: false
     };
     const [open, setOpen] = React.useState(false);
-
     return (
         <div className="flex gap-4">
             <div className="flex flex-col gap-3">
@@ -35,7 +45,7 @@ export function DateTimePicker({ date, setDate }: { date: Date | undefined, setD
                             id="date-picker"
                             className="w-32 justify-between font-normal"
                         >
-                            {date ? date.toLocaleDateString() : "Select date"}
+                            {date ? format(date, 'd MMM H:mm') : "Select date"}
                             <ChevronDownIcon />
                         </Button>
                     </PopoverTrigger>
@@ -46,6 +56,7 @@ export function DateTimePicker({ date, setDate }: { date: Date | undefined, setD
                             captionLayout="dropdown"
                             onSelect={(ddate) => {
                                 if (ddate) {
+                                    console.log(typeof date)
                                     const newDate = date || new Date();
                                     newDate.setFullYear(ddate.getFullYear(), ddate.getMonth(), ddate.getDate());
                                     setDate(newDate);
@@ -66,7 +77,7 @@ export function DateTimePicker({ date, setDate }: { date: Date | undefined, setD
                     type="time"
                     id="time-picker"
                     step="1"
-                    value={date ? date.toLocaleTimeString('en-US') : '00:00:00'}
+                    value={date ? format(date, 'HH:mm:ss') : '00:00:00'}
                     onChange={(e) => {
                         if (date === undefined) {
                             date = new Date()

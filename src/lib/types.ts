@@ -1,3 +1,7 @@
+export interface Tags {
+    title: string,
+    color: string
+}
 
 export interface Todo {
     id: string;
@@ -7,4 +11,5 @@ export interface Todo {
     dueDate?: Date;
     priority: 'low' | 'medium' | 'high';
     createdAt: Date;
+    tags?: Tags
 }
